@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Marck+Script&family=Montserrat:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Nunito:wght@400;700;900&family=Open+Sans:wght@400;700;800&family=Oswald:wght@400;600;700&family=PT+Sans:wght@400;700&family=Roboto:wght@400;700;900&family=Rubik:wght@400;700;900&family=Yeseva+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=eL0SD-jhhr-DCYkUM_SzRI8vXA6LlLlPA14nv2WPJ57rURQFqAacf1d5gNkazyBZ4td41F0LFR9NRaADWLWRAnsR2BUsm615EO2b-9_shtDTNZdTA7eE0ZVtdzAshGcxKTo5dTa4ZdUnYpefuqn9p9vgs91FrxHGKDX69D7Mj6zpaRubDIDL0fuPC6Z8OSqOEHAaOFyIgBmEtSfY5mRpBZUITUHQjxlc7ceBxGFW-d6Zz_aaPHacsBUaUdGOWpq5TATah4m-tUjCfX8sj4TpvANklHd59tV8Stk_ursKs-t9fZNeYH3PlFFWRX24QV9b" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9jaGF0Z3B0LmNvbS9iYWNrZW5kLWFwaS9lc3R1YXJ5L2NvbnRlbnQ_aWQ9ZmlsZV8wMDAwMDAwMDkyZjg4MWY0OTVlODE0ZTBmODk0ZjBhNyZmbj1pbmRleCUyODQlMjkuaHRtbCZjZD1hdHRhY2htZW50JnRzPTQ5NjM4MiZwPWZzJmNpZD0xJnNpZz02YjdjZTlmMDhjZjE2MTM1NzEyMmEzMmVkNzc0ODZmMjg1OTdmYzQ5MTAzNmNkNTA2Mzc0ZjNjZTNlYjM5OTBkJnY9MA"/><script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 <style>
 :root{
   --bg:#1c1917;--panel:#292524;--panel2:#3a3330;--line:#44403c;
@@ -17,12 +17,7 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
-body{
-    overflow:hidden;
-    margin:0;
-    width:100%;
-    height:100%;
-}
+body{overflow:hidden;display:flex;flex-direction:column;}
 
 /* Кастомные скроллбары под стиль редактора */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -30,13 +25,7 @@ body{
 ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
-.app{
-    width:1920px;
-    height:1080px;
-    display:grid;
-    grid-template-columns:900px 1020px;
-    min-height:0;
-}
+.app{flex:1;display:grid;grid-template-columns:minmax(430px,47%) 1fr;min-height:0;}
 .editor{overflow:auto;padding:22px;background:linear-gradient(180deg,#292524 0%,#1c1917 100%);border-right:1px solid var(--line)}
 .preview{display:flex;flex-direction:column;background:var(--preview);min-width:0}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
@@ -117,13 +106,28 @@ iframe{width:100%;max-width:980px;aspect-ratio:16/9;border:1px solid var(--line)
 /* Новый адаптивный список заданий */
 .task-row{
   display:grid;
-  grid-template-columns:35px 35px 105px minmax(150px,1.4fr) minmax(100px,1fr) minmax(100px,1fr) 35px;
+  grid-template-columns:
+    35px 
+    35px 
+    130px 
+    minmax(200px,1.5fr) 
+    minmax(160px,1fr) 
+    minmax(160px,1fr) 
+    35px;
   gap:5px;
   align-items:center;
   padding:8px 4px;
   width:100%;
   box-sizing:border-box;
-border-bottom:1px solid var(--line);
+}
+
+.tasks-scroll {
+  width:100%;
+  overflow-x:auto;
+}
+
+#targets {
+  min-width:850px;
 }
 
 .task-row input{
@@ -451,7 +455,9 @@ border-bottom:1px solid var(--line);
         </div>
       </div>
       
-      <div id="targets"></div>
+   <div class="tasks-scroll">
+    <div id="targets"></div>
+</div>
       
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
         <button class="btn btn-soft" onclick="addTask()">+ Добавить строку</button>
@@ -2554,23 +2560,6 @@ function updateInteractivity() {
 function changed(){updateBackgroundModeUI();updateUnifiedUI();updateInteractivity();save();updatePreview()}
 
 load();updateBackgroundModeUI();updateUnifiedUI();updateInteractivity();renderTargets();renderTargetVisuals();updatePreview();
-</script>
-<script>
-function scaleForGenially(){
-
-    const app = document.querySelector('.app');
-
-    const scale = Math.min(
-        window.innerWidth / 1920,
-        window.innerHeight / 1080
-    );
-
-    app.style.transformOrigin = "top left";
-    app.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('resize', scaleForGenially);
-scaleForGenially();
 </script>
 </body>
 </html>
