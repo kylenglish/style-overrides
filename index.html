@@ -103,6 +103,69 @@ iframe{width:100%;max-width:980px;aspect-ratio:16/9;border:1px solid var(--line)
 }
 .bank-table{width:100%;border-collapse:collapse;font-size:12px}
 .bank-table td,.bank-table th{border-bottom:1px solid var(--line);padding:8px;text-align:left;color:var(--muted);letter-spacing:0.5px;}
+/* Новый адаптивный список заданий */
+.task-row{
+  display:grid;
+  grid-template-columns:35px 35px 105px minmax(150px,1.4fr) minmax(100px,1fr) minmax(100px,1fr) 35px;
+  gap:5px;
+  align-items:center;
+  padding:8px 4px;
+  width:100%;
+  box-sizing:border-box;
+border-bottom:1px solid var(--line);
+}
+
+.task-row input{
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  font-size:14px;
+  padding:8px;
+}
+
+.task-row > div{
+  min-width:0;
+  overflow:hidden;
+}
+
+.task-head{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+}
+
+.row-drag{
+  cursor:grab;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.row-num{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--mint);
+  font-weight:700;
+  font-size:14px;
+}
+
+.row-delete{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+}
+
+.row-delete .icon-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f2bf57;
+  font-size:20px;
+}
 
 /* Стили для drag-and-drop */
 .task-row.dragging { opacity: 0.4; background: rgba(0,0,0,0.4); }
@@ -2319,7 +2382,20 @@ window.dropTask = function(e, i) {
 };
 
 renderTargets=function(){
-$('targets').innerHTML='<div style="max-height: 400px; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--line); border-radius: 12px; background: #0c0a09; width:100%;"><table class="bank-table" style="width:100%; table-layout:fixed; margin:0;"><tr><th style="width:50px; text-align:center;"></th><th style="width:40px; text-align:center;">№</th><th style="width:18%">ТИП</th><th style="width:32%">ВОПРОС</th><th style="width:20%" title="Можно использовать разделитель |">ПРАВИЛЬНЫЕ</th><th style="width:20%" title="Можно использовать разделитель |">НЕПРАВИЛЬНЫЕ</th><th style="width:50px; text-align:center;"></th></tr>'+tasksList.map((t,i)=>{
+$('targets').innerHTML=
+'<div style="max-height:400px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--line); border-radius:12px; background:#0c0a09; width:100%;">'+
+
+'<div class="task-row task-head">'+
+'<div></div>'+
+'<div>№</div>'+
+'<div>ТИП</div>'+
+'<div>ВОПРОС</div>'+
+'<div>ПРАВИЛЬНЫЕ</div>'+
+'<div>НЕПРАВИЛЬНЫЕ</div>'+
+'<div></div>'+
+'</div>'+
+
+tasksList.map((t,i)=>{
     
     let isCorrectDisabled = (t.type === 'free');
     let isWrongDisabled = (t.type === 'free' || t.type === 'tf' || t.type === 'text' || t.type === 'order');
@@ -2330,15 +2406,24 @@ $('targets').innerHTML='<div style="max-height: 400px; overflow-y: auto; overflo
     let correctDis = isCorrectDisabled ? 'disabled style="width: 100%; box-sizing: border-box; text-align:center; color:#78716c; background:#1c1917; border-color:transparent;"' : 'style="width: 100%; box-sizing: border-box;" placeholder="'+corPlaceholder+'"';
     let wrongDis = isWrongDisabled ? 'disabled style="width: 100%; box-sizing: border-box; text-align:center; color:#78716c; background:#1c1917; border-color:transparent;"' : 'style="width: 100%; box-sizing: border-box;" placeholder="'+wrPlaceholder+'"';
 
-return '<tr class="task-row" ondragstart="dragTaskStart(event, '+i+')" ondragover="dragTaskOver(event, '+i+')" ondragleave="dragTaskLeave(event)" ondrop="dropTask(event, '+i+')" ondragend="dragTaskEnd(event)">'+ 
-'<td onmousedown="this.parentElement.draggable=true" ontouchstart="this.parentElement.draggable=true" onmouseup="this.parentElement.draggable=false" ontouchend="this.parentElement.draggable=false" onmouseleave="this.parentElement.draggable=false" style="cursor: grab; text-align:center; color:var(--muted); font-size:16px; user-select: none;" title="Потяните, чтобы переместить">☰</td>'+
- '<td style="text-align:center; font-weight:700; color:var(--mint);">'+(i+1)+'</td>'+ 
- '<td><input type="text" style="width: 100%; box-sizing: border-box; cursor: pointer;" value="'+getTypeRu(t.type)+'" placeholder="Тип" onclick="showTypeDropdown(event, '+i+')" onchange="parseManualType(this.value, '+i+')" onpaste="handleTablePaste(event, '+i+')"></td>'+ 
- '<td><input type="text" style="width: 100%; box-sizing: border-box;" value="'+esc(t.question||'')+'" placeholder="Вопрос" oninput="tasksList['+i+'].question=this.value;changed()" onpaste="handleTablePaste(event, '+i+')"></td>'+ 
- '<td><input type="text" '+correctDis+' value="'+esc(t.correct||'')+'" '+(t.type==='tf'?'onclick="showBoolDropdown(event, '+i+')" style="cursor: pointer; width: 100%; box-sizing: border-box;"':'')+' oninput="if(!this.disabled){tasksList['+i+'].correct=this.value;changed()}" onpaste="handleTablePaste(event, '+i+')"></td>'+ 
- '<td><input type="text" '+wrongDis+' value="'+esc(t.wrong||'')+'" oninput="if(!this.disabled){tasksList['+i+'].wrong=this.value;changed()}" onpaste="handleTablePaste(event, '+i+')"></td>'+ 
- '<td style="text-align:center; width:50px;"><button class="icon-btn" style="width:36px; min-width:36px;" onclick="removeTask('+i+')">✕</button></td></tr>'
- }).join('')+'</table></div>';
+return '<div class="task-row" ondragstart="dragTaskStart(event, '+i+')" ondragover="dragTaskOver(event, '+i+')" ondragleave="dragTaskLeave(event)" ondrop="dropTask(event, '+i+')" ondragend="dragTaskEnd(event)">'+ 
+
+'<div class="row-drag" onmousedown="this.parentElement.draggable=true" ontouchstart="this.parentElement.draggable=true" onmouseup="this.parentElement.draggable=false" ontouchend="this.parentElement.draggable=false" onmouseleave="this.parentElement.draggable=false" title="Потяните, чтобы переместить">☰</div>'+
+
+'<div class="row-num">'+(i+1)+'</div>'+
+
+'<div><input type="text" style="width: 100%; box-sizing: border-box; cursor: pointer;" value="'+getTypeRu(t.type)+'" placeholder="Тип" onclick="showTypeDropdown(event, '+i+')" onchange="parseManualType(this.value, '+i+')" onpaste="handleTablePaste(event, '+i+')"></div>'+
+
+'<div><input type="text" style="width: 100%; box-sizing: border-box;" value="'+esc(t.question||'')+'" placeholder="Вопрос" oninput="tasksList['+i+'].question=this.value;changed()" onpaste="handleTablePaste(event, '+i+')"></div>'+
+
+'<div><input type="text" '+correctDis+' value="'+esc(t.correct||'')+'" '+(t.type==='tf'?'onclick="showBoolDropdown(event, '+i+')" style="cursor:pointer; width:100%; box-sizing:border-box;"':'')+' oninput="if(!this.disabled){tasksList['+i+'].correct=this.value;changed()}" onpaste="handleTablePaste(event, '+i+')"></div>'+
+
+'<div><input type="text" '+wrongDis+' value="'+esc(t.wrong||'')+'" oninput="if(!this.disabled){tasksList['+i+'].wrong=this.value;changed()}" onpaste="handleTablePaste(event, '+i+')"></div>'+
+
+'<div class="row-delete"><button class="icon-btn" onclick="removeTask('+i+')">✕</button></div>'+
+
+'</div>'
+ }).join('')+'</div>';
 }
 
 function renderTargetVisuals() {
